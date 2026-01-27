@@ -1,6 +1,6 @@
 # Paraglider Stamina Replacer
 
-An override for Tictim's Paragliders mod that replaces the default stamina circle with a more vanilla-friendly HUD bar.
+An override for [Tictim's Paragliders mod](https://www.curseforge.com/minecraft/mc-mods/paragliders) mod that replaces the default stamina circle with a more vanilla-friendly HUD bar.
 
 ## Features
 
@@ -20,6 +20,10 @@ An override for Tictim's Paragliders mod that replaces the default stamina circl
 1. Make sure you have Tictim's Paragliders installed.
 2. Place the `Paraglider Stamina Replacer` mod JAR into your `mods` folder.
 3. Launch Minecraft with Forge.
+
+## Credits
+
+Big thanks to Tictim for Paragliders and a solid stamina system
 
 ## License
 
