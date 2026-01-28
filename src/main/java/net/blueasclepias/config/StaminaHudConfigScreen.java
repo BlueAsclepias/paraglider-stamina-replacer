@@ -1,6 +1,7 @@
 package net.blueasclepias.config;
 
 import net.blueasclepias.core.ParagliderStaminaReplacer;
+import net.blueasclepias.enums.HudAnchor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,10 +12,10 @@ public class StaminaHudConfigScreen extends Screen {
 
     private final Screen parent;
     private static final ResourceLocation BG =
-            new ResourceLocation(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_background.png");
+            ResourceLocation.fromNamespaceAndPath(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_background.png");
 
     private static final ResourceLocation FILL =
-            new ResourceLocation(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_progress.png");
+            ResourceLocation.fromNamespaceAndPath(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_progress.png");
 
     private static final int BAR_WIDTH = 81;
     private static final int BAR_HEIGHT = 10;
@@ -25,6 +26,7 @@ public class StaminaHudConfigScreen extends Screen {
 
     private int barX = HudConfigCache.barX;
     private int barY = HudConfigCache.barY;
+    private HudAnchor anchor = HudConfigCache.anchor;
 
     public StaminaHudConfigScreen(Screen parent) {
         super(Component.literal("Stamina HUD Configuration"));
@@ -36,16 +38,36 @@ public class StaminaHudConfigScreen extends Screen {
         // Done button
         this.addRenderableWidget(
                 Button.builder(Component.literal("Done"), b -> onClose())
-                        .bounds(this.width / 2 - 50, this.height - 30, 100, 20)
+                        .bounds(this.width - 105, this.height - 30, 100, 20)
                         .build()
         );
+
+        if(minecraft.level != null) {
+            this.addRenderableWidget(
+                    Button.builder(Component.literal("Snap to Health"), b -> {
+                                anchor = HudAnchor.ABOVE_HEALTH;
+                                onClose();
+                            })
+                            .bounds(this.width - 105, this.height - 55, 100, 20)
+                            .build()
+            );
+
+            this.addRenderableWidget(
+                    Button.builder(Component.literal("Snap to Hunger"), b -> {
+                                anchor = HudAnchor.ABOVE_HUNGER;
+                                onClose();
+                            })
+                            .bounds(this.width - 105, this.height - 80, 100, 20)
+                            .build()
+            );
+        }
+
+        ParagliderStaminaReplacer.shouldRender = false;
     }
 
     @Override
     public void render(GuiGraphics gfx, int mouseX, int mouseY, float partialTick) {
-
         boolean inWorld = minecraft.level != null;
-
         if (!inWorld) {
             gfx.fill(0, 0, this.width, this.height, 0xAA000000); // semi-transparent black
             gfx.drawCenteredString(
@@ -60,7 +82,7 @@ public class StaminaHudConfigScreen extends Screen {
 
             gfx.drawCenteredString(
                     this.font,
-                    Component.literal("Left-Click the Stamina Bar to drag it around the screen!"),
+                    Component.literal("Left-Click the Stamina Bar to drag it around the screen."),
                     this.width / 2,
                     this.height / 2 - 10,
                     0x00FF00
@@ -95,6 +117,8 @@ public class StaminaHudConfigScreen extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
         if (dragging) {
+            // if we drag, change snapping mode to free movement
+            anchor = HudAnchor.FREE;
             barX = this.width / 2 - (int) mouseX - dragOffsetX;
             barY = this.height - (int) mouseY - dragOffsetY;
             return true;
@@ -110,8 +134,10 @@ public class StaminaHudConfigScreen extends Screen {
 
     @Override
     public void onClose() {
+        ParagliderStaminaReplacer.shouldRender = true;
         ClientConfig.OFFSET_X.set(barX);
         ClientConfig.OFFSET_Y.set(barY);
+        ClientConfig.ANCHOR.set(anchor);
         this.minecraft.setScreen(parent);
     }
 }

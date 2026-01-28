@@ -14,17 +14,22 @@ import tictim.paraglider.api.stamina.Stamina;
 public class StaminaHUDBar implements IGuiOverlay {
 
     private static final ResourceLocation BG =
-            new ResourceLocation(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_background.png");
+            ResourceLocation.fromNamespaceAndPath(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_background.png");
 
     private static final ResourceLocation FILL =
-            new ResourceLocation(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_progress.png");
+            ResourceLocation.fromNamespaceAndPath(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_progress.png");
 
+    private static final ResourceLocation RED =
+            ResourceLocation.fromNamespaceAndPath(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_red.png");
 
     private static final int BAR_WIDTH = 81;
     private static final int BAR_HEIGHT = 10;
 
+
+
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        if(!ParagliderStaminaReplacer.shouldRender) return;
         Minecraft mc = Minecraft.getInstance();
         // we don't need to check for screens, since much like the rest of the HUD, it remains in place.
         if(mc.player==null || mc.options.hideGui ||
@@ -35,26 +40,44 @@ public class StaminaHUDBar implements IGuiOverlay {
         int maxStamina = s.maxStamina();
         int stamina = Math.min(maxStamina, s.stamina());
         if(stamina>=maxStamina) {
-            renderBar(guiGraphics, 1, screenWidth, screenHeight);
+            renderBar(gui, guiGraphics, 1, screenWidth, screenHeight, false);
+        } else {
+            float ratio = Mth.clamp((float) stamina / (float) maxStamina, 0f, 1f);
+            renderBar(gui, guiGraphics, ratio, screenWidth, screenHeight, s.isDepleted());
         }
-        float ratio = 0;
-        if(!s.isDepleted()){
-            ratio = Mth.clamp((float) stamina / (float) maxStamina, 0f, 1f);
-        }
-        renderBar(guiGraphics, ratio, screenWidth, screenHeight);
     }
 
     private void renderBar(
+            ForgeGui gui,
             GuiGraphics g,
             float ratio,
             int screenWidth,
-            int screenHeight
+            int screenHeight,
+            boolean isDepleted
     ) {
-
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
-        int x = screenWidth / 2 - HudConfigCache.barX;
-        int y = screenHeight - HudConfigCache.barY;
+        int x = (int) (screenWidth / 2);
+        int y;
+
+        // offsets are always relative to the anchor
+        switch(HudConfigCache.anchor){
+            case ABOVE_HEALTH -> {
+                int armorOffset = hasArmor()?0:BAR_HEIGHT;
+                x -= 91;
+                y = screenHeight - gui.leftHeight + armorOffset;
+                gui.leftHeight += BAR_HEIGHT + 2;
+            }
+            case ABOVE_HUNGER -> {
+                x += 10;
+                y = screenHeight - gui.rightHeight;
+                gui.rightHeight += BAR_HEIGHT + 2;
+            }
+            default -> { // FREE is default
+                x -= HudConfigCache.barX;
+                y = screenHeight - HudConfigCache.barY;
+            }
+        }
 
         // background
         g.blit(
@@ -69,12 +92,17 @@ public class StaminaHUDBar implements IGuiOverlay {
         int filled = (int)(BAR_WIDTH * ratio);
         if (filled > 0) {
             g.blit(
-                    FILL,
+                    isDepleted?RED:FILL,
                     x, y,
                     0, 0,
                     filled, BAR_HEIGHT,
                     BAR_WIDTH, BAR_HEIGHT
             );
         }
+    }
+
+    private static boolean hasArmor() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.player != null && mc.player.getArmorValue() > 0;
     }
 }
