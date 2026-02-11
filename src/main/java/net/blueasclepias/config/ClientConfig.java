@@ -1,5 +1,7 @@
 package net.blueasclepias.config;
 
+import net.blueasclepias.enums.FillDirection;
+import net.blueasclepias.enums.FillType;
 import net.blueasclepias.enums.HudAnchor;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -10,6 +12,8 @@ public class ClientConfig {
     public static ForgeConfigSpec.EnumValue<HudAnchor> ANCHOR;
     public static ForgeConfigSpec.IntValue OFFSET_X;
     public static ForgeConfigSpec.IntValue OFFSET_Y;
+    public static ForgeConfigSpec.EnumValue<FillDirection> FILL_DIRECTION;
+    public static ForgeConfigSpec.EnumValue<FillType> FILL_TYPE;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -18,7 +22,7 @@ public class ClientConfig {
 
         ANCHOR = builder
                 .comment("How the stamina bar is anchored to the HUD")
-                .defineEnum("anchor", HudAnchor.ABOVE_HEALTH);
+                .defineEnum("anchor", HudAnchor.HEALTH);
 
         OFFSET_X = builder
                 .comment("Horizontal offset of the stamina bar")
@@ -27,6 +31,14 @@ public class ClientConfig {
         OFFSET_Y = builder
                 .comment("Vertical offset of the stamina bar")
                 .defineInRange("offsetY", 59, -10000, 10000);
+
+        FILL_DIRECTION = builder
+                .comment("Stamina bar fill direction")
+                .defineEnum("fillDirection", FillDirection.LEFT);
+
+        FILL_TYPE = builder
+                .comment("Stamina bar fill type")
+                .defineEnum("fillType", FillType.DYNAMIC);
 
         builder.pop();
 

@@ -1,6 +1,8 @@
 package net.blueasclepias.config;
 
 import net.blueasclepias.core.ParagliderStaminaReplacer;
+import net.blueasclepias.enums.FillDirection;
+import net.blueasclepias.enums.FillType;
 import net.blueasclepias.enums.HudAnchor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -27,6 +29,8 @@ public class StaminaHudConfigScreen extends Screen {
     private int barX = HudConfigCache.barX;
     private int barY = HudConfigCache.barY;
     private HudAnchor anchor = HudConfigCache.anchor;
+    private FillDirection fillDirection = HudConfigCache.fillDirection;
+    private FillType fillType = HudConfigCache.fillType;
 
     public StaminaHudConfigScreen(Screen parent) {
         super(Component.literal("Stamina HUD Configuration"));
@@ -44,20 +48,52 @@ public class StaminaHudConfigScreen extends Screen {
 
         if(minecraft.level != null) {
             this.addRenderableWidget(
-                    Button.builder(Component.literal("Snap to Health"), b -> {
-                                anchor = HudAnchor.ABOVE_HEALTH;
-                                onClose();
+                    Button.builder(Component.literal("Left"), b -> {
+                                fillDirection = FillDirection.LEFT;
                             })
-                            .bounds(this.width - 105, this.height - 55, 100, 20)
+                            .bounds(this.width - 105, this.height - 113, 50, 20)
                             .build()
             );
 
             this.addRenderableWidget(
-                    Button.builder(Component.literal("Snap to Hunger"), b -> {
-                                anchor = HudAnchor.ABOVE_HUNGER;
+                    Button.builder(Component.literal("Right"), b -> {
+                                fillDirection = FillDirection.RIGHT;
+                            })
+                            .bounds(this.width - 55, this.height - 113, 50, 20)
+                            .build()
+            );
+
+            this.addRenderableWidget(
+                    Button.builder(Component.literal("Dynamic"), b -> {
+                                fillType = FillType.DYNAMIC;
+                            })
+                            .bounds(this.width - 105, this.height - 83, 50, 20)
+                            .build()
+            );
+
+            this.addRenderableWidget(
+                    Button.builder(Component.literal("Vanilla"), b -> {
+                                fillType = FillType.VANILLA;
+                            })
+                            .bounds(this.width - 55, this.height - 83, 50, 20)
+                            .build()
+            );
+
+            this.addRenderableWidget(
+                    Button.builder(Component.literal("Health"), b -> {
+                                anchor = HudAnchor.HEALTH;
                                 onClose();
                             })
-                            .bounds(this.width - 105, this.height - 80, 100, 20)
+                            .bounds(this.width - 105, this.height - 53, 50, 20)
+                            .build()
+            );
+
+            this.addRenderableWidget(
+                    Button.builder(Component.literal("Hunger"), b -> {
+                                anchor = HudAnchor.HUNGER;
+                                onClose();
+                            })
+                            .bounds(this.width - 55, this.height - 53, 50, 20)
                             .build()
             );
         }
@@ -84,7 +120,31 @@ public class StaminaHudConfigScreen extends Screen {
                     this.font,
                     Component.literal("Left-Click the Stamina Bar to drag it around the screen."),
                     this.width / 2,
-                    this.height / 2 - 10,
+                    this.height / 2 - 50,
+                    0x00FF00
+            );
+
+            gfx.drawString(
+                    this.font,
+                    Component.literal("Fill Direction: " + fillDirection),
+                    this.width - 104,
+                    this.height - 122,
+                    0x00FF00
+            );
+
+            gfx.drawString(
+                    this.font,
+                    Component.literal("Fill Type: " + fillType),
+                    this.width - 104,
+                    this.height - 92,
+                    0x00FF00
+            );
+
+            gfx.drawString(
+                    this.font,
+                    Component.literal("Snap To " + anchor),
+                    this.width - 104,
+                    this.height - 62,
                     0x00FF00
             );
 
@@ -138,6 +198,8 @@ public class StaminaHudConfigScreen extends Screen {
         ClientConfig.OFFSET_X.set(barX);
         ClientConfig.OFFSET_Y.set(barY);
         ClientConfig.ANCHOR.set(anchor);
+        ClientConfig.FILL_DIRECTION.set(fillDirection);
+        ClientConfig.FILL_TYPE.set(fillType);
         this.minecraft.setScreen(parent);
     }
 }
