@@ -4,6 +4,7 @@ import net.blueasclepias.core.ParagliderStaminaReplacer;
 import net.blueasclepias.enums.FillDirection;
 import net.blueasclepias.enums.FillType;
 import net.blueasclepias.enums.HudAnchor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -31,10 +32,20 @@ public class StaminaHudConfigScreen extends Screen {
     private HudAnchor anchor = HudConfigCache.anchor;
     private FillDirection fillDirection = HudConfigCache.fillDirection;
     private FillType fillType = HudConfigCache.fillType;
+    private boolean hideWhenUnused = HudConfigCache.hideWhenUnused;
 
     public StaminaHudConfigScreen(Screen parent) {
         super(Component.literal("Stamina HUD Configuration"));
         this.parent = parent;
+    }
+
+    private Component getHideText() {
+        return Component.literal("When Unused: ")
+                .append(
+                        hideWhenUnused
+                                ? Component.literal("Hide").withStyle(ChatFormatting.RED)
+                                : Component.literal("Show").withStyle(ChatFormatting.GREEN)
+                );
     }
 
     @Override
@@ -47,6 +58,16 @@ public class StaminaHudConfigScreen extends Screen {
         );
 
         if(minecraft.level != null) {
+
+            this.addRenderableWidget(
+                    Button.builder(getHideText(), b -> {
+                                hideWhenUnused = !hideWhenUnused;
+                                b.setMessage(getHideText());
+                            })
+                            .bounds(this.width - 105, this.height - 143, 100, 20)
+                            .build()
+            );
+
             this.addRenderableWidget(
                     Button.builder(Component.literal("Left"), b -> {
                                 fillDirection = FillDirection.LEFT;
@@ -200,6 +221,7 @@ public class StaminaHudConfigScreen extends Screen {
         ClientConfig.ANCHOR.set(anchor);
         ClientConfig.FILL_DIRECTION.set(fillDirection);
         ClientConfig.FILL_TYPE.set(fillType);
+        ClientConfig.HIDE_WHEN_UNUSED.set(hideWhenUnused);
         this.minecraft.setScreen(parent);
     }
 }

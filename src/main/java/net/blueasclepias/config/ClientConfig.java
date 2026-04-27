@@ -14,6 +14,7 @@ public class ClientConfig {
     public static ForgeConfigSpec.IntValue OFFSET_Y;
     public static ForgeConfigSpec.EnumValue<FillDirection> FILL_DIRECTION;
     public static ForgeConfigSpec.EnumValue<FillType> FILL_TYPE;
+    public static ForgeConfigSpec.BooleanValue HIDE_WHEN_UNUSED;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -39,6 +40,10 @@ public class ClientConfig {
         FILL_TYPE = builder
                 .comment("Stamina bar fill type")
                 .defineEnum("fillType", FillType.DYNAMIC);
+
+        HIDE_WHEN_UNUSED = builder
+                .comment("Hide Stamina bar when not in use")
+                .define("hideUnused", false);
 
         builder.pop();
 

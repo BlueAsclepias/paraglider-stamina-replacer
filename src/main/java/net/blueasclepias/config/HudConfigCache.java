@@ -11,6 +11,7 @@ public final class HudConfigCache {
     public static HudAnchor anchor;
     public static FillDirection fillDirection;
     public static FillType fillType;
+    public static boolean hideWhenUnused;
 
     private HudConfigCache() {}
 
@@ -20,5 +21,6 @@ public final class HudConfigCache {
         anchor = ClientConfig.ANCHOR.get();
         fillDirection = ClientConfig.FILL_DIRECTION.get();
         fillType = ClientConfig.FILL_TYPE.get();
+        hideWhenUnused = ClientConfig.HIDE_WHEN_UNUSED.get();
     }
 }

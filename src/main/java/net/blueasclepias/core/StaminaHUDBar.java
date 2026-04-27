@@ -28,6 +28,10 @@ public class StaminaHUDBar implements IGuiOverlay {
     private static final int BAR_HEIGHT = 10;
     private static final int PIXELS_PER_STEP = 4;
 
+    private float staminaAlpha = 1.0f;
+    private float timeAtFull = 0f;
+    private static final float FADE_DELAY = 10.0f;
+
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if(!ParagliderStaminaReplacer.shouldRender) return;
@@ -36,16 +40,38 @@ public class StaminaHUDBar implements IGuiOverlay {
         if(mc.player==null || mc.options.hideGui ||
                 !ParagliderMod.instance().getPlayerStateMap().hasStaminaConsumption()) return;
 
+        if (mc.player != null && mc.player.isCreative()) {
+            return;
+        }
         // Pull stamina from Paraglider
         Stamina s = Stamina.get(mc.player);
         int maxStamina = s.maxStamina();
         int stamina = Math.min(maxStamina, s.stamina());
-        if(stamina>=maxStamina) {
-            renderBar(gui, guiGraphics, 1, screenWidth, screenHeight, false);
+
+        boolean isFull = stamina >= maxStamina;
+        float delta = Minecraft.getInstance().getDeltaFrameTime();
+        float fadeSpeed = 0.1f * delta;
+
+        if (isFull) {
+            timeAtFull += delta;
+        } else {
+            timeAtFull = 0f;
+        }
+
+        if (HudConfigCache.hideWhenUnused && isFull && timeAtFull >= FADE_DELAY) {
+            staminaAlpha = Math.max(0f, staminaAlpha - fadeSpeed);
+        } else {
+            staminaAlpha = Math.min(1f, staminaAlpha + fadeSpeed);
+        }
+
+        if(isFull) {
+            renderBar(gui, guiGraphics, 1, screenWidth, screenHeight, false, staminaAlpha);
         } else {
             float ratio = Mth.clamp((float) stamina / (float) maxStamina, 0f, 1f);
-            renderBar(gui, guiGraphics, ratio, screenWidth, screenHeight, s.isDepleted());
+            renderBar(gui, guiGraphics, ratio, screenWidth, screenHeight, s.isDepleted(), staminaAlpha);
         }
+
+
     }
 
     private void renderBar(
@@ -54,9 +80,12 @@ public class StaminaHUDBar implements IGuiOverlay {
             float ratio,
             int screenWidth,
             int screenHeight,
-            boolean isDepleted
+            boolean isDepleted,
+            float staminaAlpha
     ) {
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        if (staminaAlpha <= 0f) return;
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, staminaAlpha);
 
         int x = (int) (screenWidth / 2);
         int y;
@@ -118,6 +147,7 @@ public class StaminaHUDBar implements IGuiOverlay {
                 );
             }
         }
+        RenderSystem.disableBlend();
     }
 
     private static boolean hasArmor() {
