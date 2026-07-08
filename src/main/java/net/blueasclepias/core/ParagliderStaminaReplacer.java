@@ -39,11 +39,10 @@ public class ParagliderStaminaReplacer {
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents
-    {
+    public static class ClientModEvents {
         @SubscribeEvent
         public static void registerOverlay(RegisterGuiOverlaysEvent event) {
-            event.registerAbove(VanillaGuiOverlay.FOOD_LEVEL.id(),"stamina_bar", new StaminaHUDBar());
+            event.registerAbove(VanillaGuiOverlay.FOOD_LEVEL.id(), "stamina_bar", new StaminaHUDBar());
             LOGGER.info("StaminaHUDBar registered correctly");
         }
     }

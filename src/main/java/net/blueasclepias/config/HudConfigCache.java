@@ -12,8 +12,10 @@ public final class HudConfigCache {
     public static FillDirection fillDirection;
     public static FillType fillType;
     public static boolean hideWhenUnused;
+    public static boolean displayExtraIcons;
 
-    private HudConfigCache() {}
+    private HudConfigCache() {
+    }
 
     public static void bake() {
         barX = ClientConfig.OFFSET_X.get();
@@ -22,5 +24,6 @@ public final class HudConfigCache {
         fillDirection = ClientConfig.FILL_DIRECTION.get();
         fillType = ClientConfig.FILL_TYPE.get();
         hideWhenUnused = ClientConfig.HIDE_WHEN_UNUSED.get();
+        displayExtraIcons = ClientConfig.DISPLAY_EXTRA_ICONS.get();
     }
 }

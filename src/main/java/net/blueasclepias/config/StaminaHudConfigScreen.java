@@ -13,16 +13,13 @@ import net.minecraft.resources.ResourceLocation;
 
 public class StaminaHudConfigScreen extends Screen {
 
-    private final Screen parent;
     private static final ResourceLocation BG =
             ResourceLocation.fromNamespaceAndPath(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_background.png");
-
     private static final ResourceLocation FILL =
             ResourceLocation.fromNamespaceAndPath(ParagliderStaminaReplacer.MOD_ID, "textures/gui/hud/stamina_bar_progress.png");
-
-    private static final int BAR_WIDTH = 81;
+    private static final int BAR_WIDTH = 80;
     private static final int BAR_HEIGHT = 10;
-
+    private final Screen parent;
     private boolean dragging = false;
     private int dragOffsetX;
     private int dragOffsetY;
@@ -33,18 +30,28 @@ public class StaminaHudConfigScreen extends Screen {
     private FillDirection fillDirection = HudConfigCache.fillDirection;
     private FillType fillType = HudConfigCache.fillType;
     private boolean hideWhenUnused = HudConfigCache.hideWhenUnused;
+    private boolean displayExtraIcons = HudConfigCache.displayExtraIcons;
 
     public StaminaHudConfigScreen(Screen parent) {
         super(Component.literal("Stamina HUD Configuration"));
         this.parent = parent;
     }
 
-    private Component getHideText() {
+    private Component getWhenUnusedText() {
         return Component.literal("When Unused: ")
                 .append(
                         hideWhenUnused
                                 ? Component.literal("Hide").withStyle(ChatFormatting.RED)
                                 : Component.literal("Show").withStyle(ChatFormatting.GREEN)
+                );
+    }
+
+    private Component getDisplayExtraIconsText() {
+        return Component.literal("Extra Icons: ")
+                .append(
+                        displayExtraIcons
+                                ? Component.literal("Show").withStyle(ChatFormatting.GREEN)
+                                : Component.literal("Hide").withStyle(ChatFormatting.RED)
                 );
     }
 
@@ -57,12 +64,21 @@ public class StaminaHudConfigScreen extends Screen {
                         .build()
         );
 
-        if(minecraft.level != null) {
+        if (minecraft.level != null) {
 
             this.addRenderableWidget(
-                    Button.builder(getHideText(), b -> {
+                    Button.builder(getWhenUnusedText(), b -> {
                                 hideWhenUnused = !hideWhenUnused;
-                                b.setMessage(getHideText());
+                                b.setMessage(getWhenUnusedText());
+                            })
+                            .bounds(this.width - 105, this.height - 173, 100, 20)
+                            .build()
+            );
+
+            this.addRenderableWidget(
+                    Button.builder(getDisplayExtraIconsText(), b -> {
+                                displayExtraIcons = !displayExtraIcons;
+                                b.setMessage(getDisplayExtraIconsText());
                             })
                             .bounds(this.width - 105, this.height - 143, 100, 20)
                             .build()
@@ -222,6 +238,7 @@ public class StaminaHudConfigScreen extends Screen {
         ClientConfig.FILL_DIRECTION.set(fillDirection);
         ClientConfig.FILL_TYPE.set(fillType);
         ClientConfig.HIDE_WHEN_UNUSED.set(hideWhenUnused);
+        ClientConfig.DISPLAY_EXTRA_ICONS.set(displayExtraIcons);
         this.minecraft.setScreen(parent);
     }
 }

@@ -15,6 +15,7 @@ public class ClientConfig {
     public static ForgeConfigSpec.EnumValue<FillDirection> FILL_DIRECTION;
     public static ForgeConfigSpec.EnumValue<FillType> FILL_TYPE;
     public static ForgeConfigSpec.BooleanValue HIDE_WHEN_UNUSED;
+    public static ForgeConfigSpec.BooleanValue DISPLAY_EXTRA_ICONS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -44,6 +45,10 @@ public class ClientConfig {
         HIDE_WHEN_UNUSED = builder
                 .comment("Hide Stamina bar when not in use")
                 .define("hideUnused", false);
+
+        DISPLAY_EXTRA_ICONS = builder
+                .comment("Display extra icons based on stamina upgrades")
+                .define("displayExtraIcons", false);
 
         builder.pop();
 
